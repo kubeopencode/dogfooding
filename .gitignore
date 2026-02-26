@@ -1,0 +1,31 @@
+# VS Code
+.vscode/
+
+# MacOS
+.DS_Store
+
+# Override global gitignore to track CLAUDE.md
+!CLAUDE.md
+
+# Secrets
+*.pem
+*.key
+.env
+.env.*
+
+# Secret patterns - exclude vendor directory
+*credentials*
+*secret*
+!*.example
+!vendor/
+
+# Common secret file patterns (only at root or config directories)
+/*_id
+/*_id.*
+/*_secret
+/*_secret.*
+/*_key
+/*_key.*
+/*_token
+/*_token.*
+
