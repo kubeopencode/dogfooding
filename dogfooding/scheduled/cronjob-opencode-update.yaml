@@ -45,7 +45,7 @@ spec:
               command: [sh, -c]
               args:
                 - |
-                  kubectl apply -f - <<'EOF'
+                  kubectl create -f - <<'EOF'
                   apiVersion: kubeopencode.io/v1alpha1
                   kind: Task
                   metadata:
