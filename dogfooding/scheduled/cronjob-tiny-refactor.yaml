@@ -1,7 +1,7 @@
 # Copyright Contributors to the KubeOpenCode project
-# CronJob that creates a daily KubeOpenCode Task for tiny refactoring.
+# CronJob that creates a KubeOpenCode Task for tiny refactoring every 3 days.
 #
-# This CronJob runs daily at 8:00 AM UTC and creates a Task that:
+# This CronJob runs every 3 days at 8:00 AM UTC and creates a Task that:
 # 1. Clones the kubeopencode repository
 # 2. Identifies one small refactoring opportunity
 # 3. Implements the change
@@ -20,8 +20,8 @@ metadata:
     app.kubernetes.io/component: scheduled
     app.kubernetes.io/part-of: dogfooding
 spec:
-  # Daily at 8:00 AM UTC
-  schedule: "0 8 * * *"
+  # Every 3 days at 8:00 AM UTC
+  schedule: "0 8 */3 * *"
   # Keep last 3 successful and 3 failed jobs for debugging
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
@@ -87,6 +87,6 @@ spec:
 
                       ## Context
 
-                      - Trigger: Scheduled CronJob (daily at 8:00 UTC)
+                      - Trigger: Scheduled CronJob (every 3 days at 8:00 UTC)
                       - Repository: kubeopencode/kubeopencode
                   EOF
