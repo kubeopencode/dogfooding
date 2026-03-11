@@ -60,7 +60,7 @@ spec:
                       kubeopencode.io/triggered-by: "CronJob/opencode-update"
                   spec:
                     agentRef:
-                      name: refactor
+                      name: dogfooding
                       namespace: kubeopencode-dogfooding
                     description: |
                       # OpenCode Version Update Task

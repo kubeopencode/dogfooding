@@ -81,7 +81,7 @@ spec:
                       kubeopencode.io/triggered-by: "CronJob/pr-review"
                   spec:
                     agentRef:
-                      name: bot
+                      name: dogfooding
                       namespace: kubeopencode-dogfooding
                     description: |
                       # Code Review Task for PR #${PR_NUMBER}

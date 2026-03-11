@@ -267,7 +267,7 @@ spec:
             - name: TASK_NAMESPACE
               value: "kubeopencode-slack"
             - name: AGENT_NAME
-              value: "slack"
+              value: "dogfooding"
             - name: AGENT_NAMESPACE
               value: "kubeopencode-dogfooding"
           volumeMounts:

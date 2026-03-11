@@ -9,15 +9,8 @@ resources:
   - rbac.yaml
   - secrets.yaml
   - kubeopencodeconfig.yaml
-  - agent-bot.yaml
-  - agent-dev.yaml
-  - agent-refactor.yaml
-  - agent-slack.yaml
-  - context-bot-instructions.yaml
-  - context-dev-instructions.yaml
-  - context-refactor-instructions.yaml
-  - context-slack-instructions.yaml
+  - agent-dogfooding.yaml
 
-# Note: Webhook functionality has been migrated to Argo Events.
-# See ../github/ for EventSource and Sensor configuration.
+# Note: Agent capabilities are defined by .claude/skills/ in the dogfooding repo.
 # See ../scheduled/ for CronJob configuration.
+# See ../slack/ for Slack gateway configuration.

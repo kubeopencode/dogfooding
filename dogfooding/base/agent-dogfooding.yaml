@@ -1,23 +1,22 @@
 # Copyright Contributors to the KubeOpenCode project
-# Agent configuration for automated refactoring tasks.
-# This agent performs daily tiny refactoring operations on the kubeopencode repository.
+# Unified agent configuration - capabilities defined by .claude/skills/ in the repo.
+# Adding a new capability = adding a SKILL.md file via PR.
 apiVersion: kubeopencode.io/v1alpha1
 kind: Agent
 metadata:
-  name: refactor
+  name: dogfooding
 spec:
   agentImage: quay.io/kubeopencode/kubeopencode-agent-opencode:latest
   executorImage: quay.io/kubeopencode/kubeopencode-agent-devbox:latest
   workspaceDir: /workspace
-  # command is optional - uses default: /tools/opencode run "$(cat ${WORKSPACE_DIR}/task.md)"
   serviceAccountName: kubeopencode-agent
-  # Strict concurrency: only one refactor task at a time
-  maxConcurrentTasks: 1
-  # Rate limiting: max 2 task starts per day (allows retry + manual trigger)
+  # Handles parallel tasks (GitHub event + scheduled + Slack)
+  maxConcurrentTasks: 3
+  # Rate limiting: max 200 tasks per 24 hours
   quota:
-    maxTaskStarts: 2
+    maxTaskStarts: 200
     windowSeconds: 86400
-  # Use Gemini 3 Flash for balanced speed and code understanding
+  # OpenCode configuration using Google Gemini 3.1 Pro
   config: |
     {
       "$schema": "https://opencode.ai/config.json",
@@ -26,14 +25,15 @@ spec:
       "share": "disabled",
       "autoupdate": false
     }
-  # Contexts for refactor agent
   contexts:
-    # Refactoring-specific instructions
-    - name: refactor-instructions
-      description: "Guidelines for tiny refactoring operations"
-      type: ConfigMap
-      configMap:
-        name: refactor-instructions
+    # Dogfooding repo at workspace root - .claude/skills/ auto-discovered by OpenCode
+    - name: dogfooding
+      description: "Dogfooding repo with skills and agent instructions"
+      type: Git
+      git:
+        repository: https://github.com/kubeopencode/dogfooding.git
+        ref: main
+      mountPath: .
     # KubeOpenCode source code repository
     - name: kubeopencode
       description: "KubeOpenCode source code repository"
@@ -50,7 +50,13 @@ spec:
     - name: opencode
       secretRef:
         name: opencode-credentials
-    # GitHub App credentials (same as dev agent - needs write access)
+    # GitHub App credentials (write access)
     - name: github-app
       secretRef:
         name: github-dev-credentials
+    # Slack Bot Token
+    - name: slack
+      secretRef:
+        name: slack-creds
+        key: bot-token
+      env: SLACK_BOT_TOKEN

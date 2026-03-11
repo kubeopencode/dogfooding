@@ -61,7 +61,7 @@ spec:
                       kubeopencode.io/triggered-by: "CronJob/tiny-refactor"
                   spec:
                     agentRef:
-                      name: refactor
+                      name: dogfooding
                       namespace: kubeopencode-dogfooding
                     description: |
                       # Daily Tiny Refactor Task
