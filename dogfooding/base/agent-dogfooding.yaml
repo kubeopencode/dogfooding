@@ -26,7 +26,7 @@ spec:
       "autoupdate": false
     }
   contexts:
-    # Dogfooding repo at workspace root - .claude/skills/ auto-discovered by OpenCode
+    # Dogfooding repo at workspace root - AGENTS.md and .opencode/skills/ auto-discovered
     - name: dogfooding
       description: "Dogfooding repo with skills and agent instructions"
       type: Git

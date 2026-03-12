@@ -4,7 +4,7 @@ This directory contains resources for running KubeOpenCode in a dogfooding envir
 
 ## Architecture
 
-A single unified `dogfooding` agent handles all tasks. Its capabilities are defined by `.claude/skills/` in the repo itself — the agent discovers skills automatically at runtime via the `mountPath: .` context.
+A single unified `dogfooding` agent handles all tasks. Its capabilities are defined by skills in the repo itself (`.opencode/skills/` for OpenCode, `.claude/skills/` for Claude Code) — the agent discovers them automatically at runtime via the `mountPath: .` context (see [Repo as Agent Pattern](#repo-as-agent-pattern)).
 
 ```
 GitHub / Slack / CronJobs
@@ -83,9 +83,82 @@ kubectl apply -k dogfooding/slack
 kubectl get agents -n kubeopencode-dogfooding
 ```
 
-## Agent Configuration
+## Repo as Agent Pattern
 
-The unified `dogfooding` agent is configured with:
+This environment uses the **Repo as Agent** pattern: the Git repository itself defines the agent's identity — skills, instructions, and contexts. The agent discovers capabilities automatically at runtime when the repo is mounted at the workspace root.
+
+### How It Works
+
+```
+dogfooding repo (this repo)         Kubernetes cluster
+┌──────────────────────┐          ┌─────────────────────────────┐
+│ AGENTS.md            │ ──git──▶ │ /workspace/                 │
+│ .opencode/skills/    │  clone   │   ├── AGENTS.md             │
+│   ├── pr-review/     │  into    │   ├── .opencode/skills/     │
+│   ├── slack-respond/ │ workspace│   ├── task.md  ← from Task  │
+│   └── ...            │  root    │   └── kubeopencode/ ← biz   │
+│ .claude/             │          │                             │
+│   ├── CLAUDE.md      │          │ OpenCode auto-discovers:    │
+│   └── skills/ ←used  │          │   • AGENTS.md (instructions)│
+│        by symlinks   │          │   • .opencode/skills/*      │
+└──────────────────────┘          └─────────────────────────────┘
+```
+
+### Repo Structure
+
+The repo maintains both OpenCode-native and Claude Code-compatible formats via symlinks:
+
+```
+dogfooding/
+├── AGENTS.md              → .claude/CLAUDE.md     # OpenCode native (takes precedence)
+├── .opencode/skills/      → .claude/skills/*      # OpenCode native skill discovery
+├── .claude/
+│   ├── CLAUDE.md                                  # Source of truth for agent instructions
+│   └── skills/                                    # Source of truth for skill definitions
+│       ├── pr-review/SKILL.md
+│       ├── github-respond/SKILL.md
+│       └── ...
+```
+
+OpenCode discovers `AGENTS.md` and `.opencode/skills/` at the workspace root. Claude Code discovers `.claude/CLAUDE.md` and `.claude/skills/`. Both tools read the same content via symlinks.
+
+### Agent Configuration
+
+The key to the Repo as Agent pattern is `mountPath`:
+
+| Context | `mountPath` | Volume Strategy | Purpose |
+|---------|-------------|-----------------|---------|
+| **Agent repo** (identity) | `.` (workspace root) | Merged into workspace emptyDir | AGENTS.md, skills auto-discovery |
+| **Business repo** (target) | Named subdirectory | Normal subPath mount | Code the agent works on |
+
+```yaml
+apiVersion: kubeopencode.io/v1alpha1
+kind: Agent
+metadata:
+  name: my-agent
+spec:
+  workspaceDir: /workspace          # All mounts relative to this
+  contexts:
+    # Agent identity repo — mountPath: . enables skill auto-discovery
+    - name: agent-repo
+      type: Git
+      git:
+        repository: https://github.com/org/agent-repo.git
+        ref: main
+      mountPath: .                  # Merged into /workspace/
+
+    # Business repo — mountPath: <name> for normal mount
+    - name: target-repo
+      type: Git
+      git:
+        repository: https://github.com/org/target-repo.git
+        ref: main
+      mountPath: target             # Mounted at /workspace/target/
+```
+
+> **Note**: `mountPath: .` requires KubeOpenCode v0.0.3+ (PR [#73](https://github.com/kubeopencode/kubeopencode/pull/73)). Earlier versions have a bug where the git volume mount shadows `task.md`.
+
+### Dogfooding Agent Settings
 
 | Setting | Value |
 |---------|-------|
@@ -99,7 +172,7 @@ The unified `dogfooding` agent is configured with:
 
 | Context | Type | Mount Path | Description |
 |---------|------|------------|-------------|
-| `dogfooding` | Git | `.` (workspace root) | This repo — `.claude/skills/` auto-discovered |
+| `dogfooding` | Git | `.` (workspace root) | This repo — AGENTS.md and .opencode/skills/ auto-discovered |
 | `kubeopencode` | Git | `kubeopencode` | KubeOpenCode source code for review/refactoring |
 
 ## Scheduled Tasks (CronJobs)
