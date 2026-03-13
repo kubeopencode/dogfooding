@@ -6,6 +6,7 @@ kind: Agent
 metadata:
   name: dogfooding
 spec:
+  profile: "KubeOpenCode dogfooding agent — PR review, refactoring, dependency updates, GitHub and Slack responses"
   agentImage: quay.io/kubeopencode/kubeopencode-agent-opencode:latest
   executorImage: quay.io/kubeopencode/kubeopencode-agent-devbox:latest
   workspaceDir: /workspace
