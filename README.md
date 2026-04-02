@@ -140,6 +140,41 @@ Reference repos are managed via `repos/repos.yaml` and cloned as shallow read-on
 
 When a task requires reading source code (PR review, dependency analysis, code search), check if the target repo is cloned under `repos/`. If not, run `sync-repos.sh` first. For simple metadata queries (PR status, issue counts), prefer GitHub API.
 
+### Development via Git Worktree
+
+When making code changes to repos under `repos/` (bug fixes, features, PRs), **always use git worktrees** — never modify the main clone directly. The main clone stays as a clean reference.
+
+**Worktree location:** `repos/.worktrees/<repo>/<branch>/`
+
+**Workflow:**
+
+```bash
+# 1. Ensure the main clone is a full clone (worktrees need full history)
+REPO_DIR=repos/core/kubeopencode/kubeopencode
+git -C "$REPO_DIR" fetch --unshallow 2>/dev/null || true
+git -C "$REPO_DIR" fetch origin
+
+# 2. Create a worktree for your feature branch
+BRANCH=fix/my-change
+git -C "$REPO_DIR" worktree add \
+  "$(pwd)/repos/.worktrees/kubeopencode/$BRANCH" \
+  -b "$BRANCH" origin/main
+
+# 3. Work in the worktree
+cd "repos/.worktrees/kubeopencode/$BRANCH"
+# ... make changes, commit, push ...
+
+# 4. Clean up after PR is merged
+git -C "$REPO_DIR" worktree remove \
+  "$(pwd)/repos/.worktrees/kubeopencode/$BRANCH"
+```
+
+**Rules:**
+- **Never commit directly in `repos/<category>/<org>/<repo>/`** — it is read-only reference
+- One worktree per branch; name the branch descriptively (`fix/`, `feat/`, `chore/`)
+- Clean up worktrees after the PR is merged or abandoned
+- List active worktrees: `git -C "$REPO_DIR" worktree list`
+
 ## Intermediate Artifacts
 
 All intermediate and generated files (processed data, reports, payloads, temp scripts) **MUST** go into the `.output/` directory, never the project root. This directory is git-ignored.
