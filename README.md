@@ -171,6 +171,7 @@ git -C "$REPO_DIR" worktree remove \
 
 **Rules:**
 - **Never commit directly in `repos/<category>/<org>/<repo>/`** — it is read-only reference
+- **Worktrees MUST be created under `repos/.worktrees/`** — never in global directories like `/tmp`, `~/.worktrees`, or anywhere outside the project
 - One worktree per branch; name the branch descriptively (`fix/`, `feat/`, `chore/`)
 - Clean up worktrees after the PR is merged or abandoned
 - List active worktrees: `git -C "$REPO_DIR" worktree list`
