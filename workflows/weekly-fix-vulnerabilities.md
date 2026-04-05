@@ -4,7 +4,7 @@ Check open Dependabot alerts on kubeopencode/kubeopencode and fix them by adding
 
 ## Trigger
 
-- **CronTask**: Weekly on Wednesday at 6:00 UTC (`deploy/crontasks/crontask-fix-vulnerabilities.yaml`)
+- **CronTask**: Daily at 6:00 UTC (`deploy/crontasks/crontask-fix-vulnerabilities.yaml`)
 - **Manual**: `fix vulnerabilities`, `check dependabot alerts`
 
 ## Phase 1: Query Alerts

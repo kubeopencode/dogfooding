@@ -36,7 +36,7 @@ deploy/
 │   ├── crontask-pr-review.yaml        # Daily PR review
 │   ├── crontask-tiny-refactor.yaml    # Refactoring every 3 days
 │   ├── crontask-opencode-update.yaml  # Weekly OpenCode version check
-│   └── crontask-fix-vulnerabilities.yaml # Weekly Dependabot vulnerability fix
+│   └── crontask-fix-vulnerabilities.yaml # Daily Dependabot vulnerability fix
 └── socket-mode-gateway.yaml       # Slack Socket Mode gateway (ConfigMap + Deployment)
 ```
 
@@ -109,7 +109,7 @@ All CronTasks run in the same `kubeopencode-agent` namespace.
 | `pr-review` | Daily at 7:00 UTC | Reviews open PRs without `ai-reviewed` label |
 | `tiny-refactor` | Every 3 days at 8:00 UTC | One small safe refactoring in kubeopencode |
 | `opencode-update` | Weekly Monday at 9:00 UTC | Checks for new OpenCode releases |
-| `fix-vulnerabilities` | Weekly Wednesday at 6:00 UTC | Fixes open Dependabot alerts via pnpm overrides / go get |
+| `fix-vulnerabilities` | Daily at 6:00 UTC | Fixes open Dependabot alerts via pnpm overrides / go get |
 
 All CronTasks use `concurrencyPolicy: Forbid` and `maxRetainedTasks: 5`.
 

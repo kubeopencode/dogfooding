@@ -10,8 +10,8 @@ metadata:
     app.kubernetes.io/component: scheduled
     app.kubernetes.io/part-of: kubeopencode-agent
 spec:
-  # Weekly on Wednesday at 6:00 AM UTC
-  schedule: "0 6 * * 3"
+  # Daily at 6:00 AM UTC
+  schedule: "0 6 * * *"
   concurrencyPolicy: Forbid
   maxRetainedTasks: 5
   taskTemplate:
