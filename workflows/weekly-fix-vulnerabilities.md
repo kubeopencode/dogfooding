@@ -57,17 +57,21 @@ For each Go vulnerability:
 2. Run `go mod tidy`
 3. Run `go mod vendor` if a vendor directory exists
 
-## Phase 4: Commit and Push
+## Phase 4: Commit and Create PR
 
 ```bash
 git add -A
 git commit -s -m "fix(deps): resolve Dependabot vulnerabilities
 
 <list each fixed package and CVE>"
-git push
+git push -u origin <branch-name>
 ```
 
-Push directly to main (no PR needed for dependency overrides).
+Create a pull request:
+```bash
+gh pr create --title "fix(deps): resolve Dependabot vulnerabilities" \
+  --body "<list each fixed package and patched version>"
+```
 
 ## Rules
 
