@@ -22,7 +22,7 @@ spec:
         app.kubernetes.io/part-of: kubeopencode-agent
         kubeopencode.io/scheduled: "true"
     spec:
-      agentRef:
-        name: kubeopencode-agent
+      templateRef:
+        name: kubeopencode-base
       description: |
         Follow the workflow defined in `workflows/weekly-opencode-update.md`.
