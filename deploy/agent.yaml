@@ -26,17 +26,12 @@ spec:
   persistence:
     sessions:
       size: "1Gi"
-  # OpenCode configuration using Google Gemini 3.1 Pro
-  config: |
-    {
-      "$schema": "https://opencode.ai/config.json",
-      "model": "opencode/gemini-3.1-pro",
-      "small_model": "opencode/gemini-3-flash",
-      "share": "disabled",
-      "autoupdate": false,
-      "agent": {
-        "general": {
-          "model": "opencode/gemini-3-flash"
-        }
-      }
-    }
+  # OpenCode Go subscription using Kimi K2.6
+  config:
+    model: opencode-go/kimi-k2.6
+    small_model: opencode-go/kimi-k2.6
+    share: disabled
+    autoupdate: false
+    agent:
+      general:
+        model: opencode-go/kimi-k2.6

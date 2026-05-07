@@ -82,9 +82,10 @@ agent repo (this repo)              Kubernetes cluster
 | Setting | Value |
 |---------|-------|
 | **Template** | kubeopencode-base |
-| **Model** | gemini-3.1-pro |
-| **Small Model** | gemini-3-flash |
-| **General Subagent** | gemini-3-flash |
+| **Provider** | OpenCode Go |
+| **Model** | kimi-k2.6 |
+| **Small Model** | kimi-k2.6 |
+| **General Subagent** | kimi-k2.6 |
 | **Max Concurrent Tasks** | 3 |
 | **Rate Limit** | 200 task starts per 24 hours |
 | **Standby** | Auto-suspend after 30m idle, auto-resume on new Task |
