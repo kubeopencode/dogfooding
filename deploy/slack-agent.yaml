@@ -1,0 +1,38 @@
+# Copyright Contributors to the KubeOpenCode project
+# Standby Slack agent — responds to @mentions and DMs via opencode-slack-plugin.
+# Uses Socket Mode (outbound WebSocket) for zero port exposure.
+#
+# Inherits images, credentials, contexts, workspaceDir, and serviceAccountName
+# from the kubeopencode-base AgentTemplate.
+apiVersion: kubeopencode.io/v1alpha1
+kind: Agent
+metadata:
+  name: slack-agent
+spec:
+  templateRef:
+    name: kubeopencode-base
+  profile: "Slack integration agent — responds to @mentions and DMs via opencode-slack-plugin"
+  # Handles parallel Slack conversations
+  maxConcurrentTasks: 3
+  # Rate limiting: max 200 tasks per 24 hours
+  quota:
+    maxTaskStarts: 200
+    windowSeconds: 86400
+  # Session persistence: conversation history survives pod restarts
+  persistence:
+    sessions:
+      size: "1Gi"
+  # OpenCode Slack plugin — connects via Socket Mode and maps each Slack thread
+  # to an independent OpenCode session.
+  plugins:
+    - name: "@kubeopencode/opencode-slack-plugin"
+      target: server
+  # OpenCode Go subscription using Kimi K2.6
+  config:
+    model: opencode-go/kimi-k2.6
+    small_model: opencode-go/kimi-k2.6
+    share: disabled
+    autoupdate: false
+    agent:
+      general:
+        model: opencode-go/kimi-k2.6

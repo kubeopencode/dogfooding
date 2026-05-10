@@ -37,9 +37,15 @@ spec:
     - name: github-app
       secretRef:
         name: github-dev-credentials
-    # Slack Bot Token
+    # Slack Bot Token (legacy socket-mode-gateway, kept for backward compat)
     - name: slack
       secretRef:
         name: slack-creds
         key: bot-token
       env: SLACK_BOT_TOKEN
+    # Slack Socket Mode App Token (for opencode-slack-plugin)
+    - name: slack-app-token
+      secretRef:
+        name: slack-socket-mode-creds
+        key: app-token
+      env: SLACK_APP_TOKEN

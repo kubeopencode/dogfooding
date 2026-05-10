@@ -23,3 +23,14 @@ repos:
         description: KubeOpenCode platform — operator, CRDs, controllers
       - repo: kubeopencode/skills
         description: Community skill library for KubeOpenCode agents
+      - repo: kubeopencode/kubeopencode-plugins
+        description: OpenCode plugins — Slack integration, custom branding, and more
+
+  # ============================================================
+  # Dependencies — upstream projects we depend on
+  # ============================================================
+
+  deps:
+    anomalyco:
+      - repo: anomalyco/opencode
+        description: OpenCode — AI coding agent (TUI + server), our runtime dependency

@@ -32,12 +32,12 @@ deploy/
 ├── kubeopencodeconfig.yaml        # Cluster-wide KubeOpenCode settings
 ├── agenttemplate.yaml             # kubeopencode-base (shared images, credentials, contexts)
 ├── agent.yaml                     # kubeopencode-agent (references template, adds model config + standby)
+├── slack-agent.yaml               # slack-agent (Slack integration via opencode-slack-plugin)
 ├── crontasks/                     # Scheduled tasks (CronTask CRDs)
 │   ├── crontask-pr-review.yaml        # Daily PR review
 │   ├── crontask-tiny-refactor.yaml    # Refactoring every 3 days
 │   ├── crontask-opencode-update.yaml  # Weekly OpenCode version check
 │   └── crontask-fix-vulnerabilities.yaml # Daily Dependabot vulnerability fix
-└── socket-mode-gateway.yaml       # Slack Socket Mode gateway (ConfigMap + Deployment)
 ```
 
 ## Setup
@@ -77,7 +77,7 @@ agent repo (this repo)              Kubernetes cluster
 +----------------------+          +-----------------------------+
 ```
 
-### Agent Settings
+### kubeopencode-agent Settings
 
 | Setting | Value |
 |---------|-------|
@@ -89,6 +89,17 @@ agent repo (this repo)              Kubernetes cluster
 | **Max Concurrent Tasks** | 3 |
 | **Rate Limit** | 200 task starts per 24 hours |
 | **Standby** | Auto-suspend after 30m idle, auto-resume on new Task |
+| **Persistence** | Sessions (1Gi PVC) |
+
+### slack-agent Settings
+
+| Setting | Value |
+|---------|-------|
+| **Template** | kubeopencode-base |
+| **Plugin** | `@kubeopencode/opencode-slack-plugin` |
+| **Model** | kimi-k2.6 |
+| **Max Concurrent Tasks** | 3 |
+| **Rate Limit** | 200 task starts per 24 hours |
 | **Persistence** | Sessions (1Gi PVC) |
 
 ### Context
@@ -129,4 +140,44 @@ kubectl patch crontask pr-review -n kubeopencode-agent --type merge -p '{"spec":
 
 ## Slack Integration
 
-The Slack Socket Mode gateway runs as a Deployment in the `kubeopencode-agent` namespace. When a user @mentions or DMs the bot, the gateway creates a KubeOpenCode Task. The agent responds using `slack-cli send`.
+Slack integration is handled by the dedicated **`slack-agent`** running the **`@kubeopencode/opencode-slack-plugin`**.
+
+### Architecture
+
+```
+Slack (DM / @mention)
+    |
+    | Socket Mode (outbound WebSocket)
+    v
+slack-agent Deployment
+    |
+    | opencode-slack-plugin (inside opencode serve)
+    | Maps each Slack thread → independent OpenCode session
+    v
+Direct Slack API replies (no Task creation needed)
+```
+
+- The plugin runs **inside** the `opencode serve` process — zero port exposure
+- Each Slack thread creates an independent OpenCode session with its own context
+- Permission requests and tool call progress are forwarded to Slack threads in real time
+
+
+### Credentials
+
+The `slack-agent` inherits credentials from the `kubeopencode-base` AgentTemplate:
+
+| Secret | Key | Env Var | Purpose |
+|--------|-----|---------|---------|
+| `slack-socket-mode-creds` | `app-token` | `SLACK_APP_TOKEN` | Socket Mode WebSocket connection |
+| `slack-creds` | `bot-token` | `SLACK_BOT_TOKEN` | Slack Web API (send messages) |
+
+### Deployment
+
+```bash
+# Deploy (included in kustomization.yaml)
+kubectl apply -k deploy/
+
+# Verify
+kubectl get agents -n kubeopencode-agent
+kubectl get deployment slack-agent-server -n kubeopencode-agent
+```

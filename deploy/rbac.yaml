@@ -1,7 +1,7 @@
 # Copyright Contributors to the KubeOpenCode project
 # RBAC resources for kubeopencode-agent namespace
 #
-# All resources (Agent, CronJobs, Slack gateway) run in the same namespace,
+# All resources (Agents, CronTasks) run in the same namespace,
 # so we use namespace-scoped Roles instead of ClusterRoles.
 
 # --- Agent ServiceAccount ---
@@ -31,10 +31,10 @@ rules:
   - apiGroups: ["kubeopencode.io"]
     resources: ["tasks/status"]
     verbs: ["get", "patch", "update"]
-  # Allow agent to read Agent and AgentTemplate configuration (e.g., for self-discovery)
+  # Allow agent to read and patch Agent configuration (self-discovery + plugin heartbeat)
   - apiGroups: ["kubeopencode.io"]
     resources: ["agents", "agenttemplates"]
-    verbs: ["get", "list", "watch"]
+    verbs: ["get", "list", "watch", "patch", "update"]
   # Allow agent to read KubeOpenCodeConfig (system configuration)
   - apiGroups: ["kubeopencode.io"]
     resources: ["kubeopencodeconfigs"]

@@ -57,6 +57,8 @@ All detailed docs live under `docs/` and **MUST** be linked here. When adding or
 | Document | Description |
 |----------|-------------|
 | [repos/repos.yaml](repos/repos.yaml) | Repo registry: categories, orgs, clone targets |
+| [kubeopencode-plugins](https://github.com/kubeopencode/kubeopencode-plugins) | OpenCode plugins — Slack integration, custom branding, and more |
+| [opencode](https://github.com/anomalyco/opencode) | OpenCode — AI coding agent (TUI + server), our runtime dependency |
 
 **Infrastructure & Deployment** — load when deploying or operating the agent:
 
