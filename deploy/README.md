@@ -110,6 +110,56 @@ agent repo (this repo)              Kubernetes cluster
 
 Reference repos (kubeopencode, skills, etc.) are managed via `repos/repos.yaml` and cloned on demand by `repos/sync-repos.sh` — no separate git context needed.
 
+## Model Configuration
+
+### Reasoning / Thinking Effort
+
+OpenCode models can support configurable reasoning depth. The mechanism depends on the model's provider and npm SDK:
+
+| Provider SDK | Parameter | Values |
+|---|---|---|
+| `@ai-sdk/openai` | `reasoningEffort` | `none`, `minimal`, `low`, `medium`, `high`, `xhigh` |
+| `@ai-sdk/openai-compatible` | `reasoningEffort` (via `providerOptions.openaiCompatible`) | `low`, `medium`, `high`, `max` |
+| `@ai-sdk/anthropic` | `thinking.budgetTokens` | numeric token budget |
+| `@ai-sdk/google` | `thinkingConfig.thinkingBudget` / `thinkingLevel` | numeric or `low`/`high` |
+
+### How to Check if a Model Supports Reasoning Effort
+
+1. **In the TUI**: Run `/models`, select a model, then cycle variants with the variant cycle keybind. If variants appear (e.g. `low`, `medium`, `high`), the model supports configurable reasoning.
+
+2. **Via OpenCode source code** (in `repos/deps/anomalyco/opencode`):
+   - Check `packages/opencode/src/provider/transform.ts` — the `variants()` function (line ~629) determines which reasoning variants a model gets.
+   - Models in the **exclusion list** (containing `deepseek-chat`, `deepseek-reasoner`, `deepseek-r1`, `deepseek-v3`, `minimax`, `glm`, `kimi`, `k2p`, `qwen`, `big-pickle`) return `{}` — no reasoning effort control.
+   - Models NOT in the exclusion list that use `@ai-sdk/openai-compatible` (including `deepseek-v4-*` via `opencode-go`) get the standard `["low", "medium", "high", "max"]` reasoning effort variants.
+   - Anthropic models get `thinking` with `budgetTokens` variants.
+   - Google models get `thinkingConfig` variants.
+
+3. **Via DeepSeek V4 API docs**: DeepSeek V4 models (`deepseek-v4-flash`, `deepseek-v4-pro`) support `reasoning_effort: "high" | "max"` and `thinking: { type: "enabled" | "disabled" }`. The `opencode-go` provider routes these via the OpenAI-compatible SDK.
+
+### Current Configuration
+
+The agent and template use `deepseek-v4-flash` with `reasoningEffort: high`:
+
+```yaml
+config:
+  model: opencode-go/deepseek-v4-flash
+  small_model: opencode-go/deepseek-v4-flash
+  provider:
+    opencode-go:
+      models:
+        deepseek-v4-flash:
+          options:
+            reasoningEffort: high
+  agent:
+    general:
+      model: opencode-go/deepseek-v4-flash
+```
+
+To change reasoning depth, update the `options` block. For DeepSeek V4:
+- `reasoningEffort: low` — lighter thinking
+- `reasoningEffort: high` — balanced (default for V4)
+- `reasoningEffort: max` — maximum reasoning, requires larger context window
+
 ## Scheduled Tasks (CronTasks)
 
 Scheduled tasks use the native KubeOpenCode `CronTask` CRD — a Task factory that creates Tasks on a cron schedule (analogous to CronJob creating Jobs, but without requiring kubectl Pods or RBAC for Task creation).
