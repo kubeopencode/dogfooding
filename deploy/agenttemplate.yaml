@@ -33,6 +33,11 @@ spec:
     agent:
       general:
         model: opencode-go/kimi-k2.6
+  # Proxy via Clash on K3s host
+  proxy:
+    httpProxy: "http://host.k3s.internal:7890"
+    httpsProxy: "http://host.k3s.internal:7890"
+    noProxy: "localhost,127.0.0.1,10.0.0.0/8,192.168.0.0/16"
   credentials:
     # Mount entire secret - all keys become env vars automatically
     - name: git
