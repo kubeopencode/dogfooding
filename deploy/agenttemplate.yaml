@@ -25,6 +25,14 @@ spec:
           interval: 5m
           policy: HotReload
       mountPath: .
+  config:
+    model: opencode-go/kimi-k2.6
+    small_model: opencode-go/kimi-k2.6
+    share: disabled
+    autoupdate: false
+    agent:
+      general:
+        model: opencode-go/kimi-k2.6
   credentials:
     # Mount entire secret - all keys become env vars automatically
     - name: git
