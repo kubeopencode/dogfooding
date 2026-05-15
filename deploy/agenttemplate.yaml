@@ -26,13 +26,19 @@ spec:
           policy: HotReload
       mountPath: .
   config:
-    model: opencode-go/kimi-k2.6
-    small_model: opencode-go/kimi-k2.6
+    model: opencode-go/deepseek-v4-flash
+    small_model: opencode-go/deepseek-v4-flash
     share: disabled
     autoupdate: false
+    provider:
+      opencode-go:
+        models:
+          deepseek-v4-flash:
+            options:
+              reasoningEffort: high
     agent:
       general:
-        model: opencode-go/kimi-k2.6
+        model: opencode-go/deepseek-v4-flash
   # Proxy via Clash on K3s host
   proxy:
     httpProxy: "http://host.k3s.internal:7897"

@@ -83,9 +83,9 @@ agent repo (this repo)              Kubernetes cluster
 |---------|-------|
 | **Template** | kubeopencode-base |
 | **Provider** | OpenCode Go |
-| **Model** | kimi-k2.6 |
-| **Small Model** | kimi-k2.6 |
-| **General Subagent** | kimi-k2.6 |
+| **Model** | deepseek-v4-flash (reasoningEffort: high) |
+| **Small Model** | deepseek-v4-flash (reasoningEffort: high) |
+| **General Subagent** | deepseek-v4-flash (reasoningEffort: high) |
 | **Max Concurrent Tasks** | 3 |
 | **Rate Limit** | 200 task starts per 24 hours |
 | **Standby** | Auto-suspend after 30m idle, auto-resume on new Task |
@@ -97,7 +97,7 @@ agent repo (this repo)              Kubernetes cluster
 |---------|-------|
 | **Template** | kubeopencode-base |
 | **Plugin** | `@kubeopencode/opencode-slack-plugin` |
-| **Model** | kimi-k2.6 |
+| **Model** | deepseek-v4-flash (reasoningEffort: high) |
 | **Max Concurrent Tasks** | 3 |
 | **Rate Limit** | 200 task starts per 24 hours |
 | **Persistence** | Sessions (1Gi PVC) |
